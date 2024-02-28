@@ -288,7 +288,7 @@ namespace hnswlib {
             std::priority_queue<std::pair<dist_t, tableint>, vector<pair<dist_t, tableint>>, CompareByFirst> candidate_set;
             dist_t dist = fstdistfunc_(data_point, getDataByInternalId(ep_id), dist_func_param_);
 
-            top_candidates.emplace(dist, ep_id);
+            // top_candidates.emplace(dist, ep_id);
             candidate_set.emplace(-dist, ep_id);
             visited_array[ep_id] = visited_array_tag;
 
@@ -297,7 +297,7 @@ namespace hnswlib {
 
             while (!candidate_set.empty()) {
                 std::pair<dist_t, tableint> current_node_pair = candidate_set.top();
-                
+                top_candidates.emplace(-current_node_pair.first, current_node_pair.second);
                 char *currObj2 = (getDataByInternalId(current_node_pair.second));
 
                 if (top_candidates.size() > ef) {
@@ -335,7 +335,7 @@ namespace hnswlib {
                         visited_array[candidatePair.second] = visited_array_tag;    
                    
                         if (top_candidates.size() < ef) {
-                            candidate_set.emplace(-candidatePair.first, candidatePair.second);
+                            // candidate_set.emplace(-candidatePair.first, candidatePair.second);
                             // std::cout << "put_on_set: " << candidatePair.second << std::endl;
     #ifdef USE_SSE
                             _mm_prefetch(data_level0_memory_ + candidate_set.top().second * size_data_per_element_ +
@@ -358,7 +358,8 @@ namespace hnswlib {
                                 topCandidatesCopy.pop();
                             }
                             if (infl_key)
-                                top_candidates.emplace(candidatePair.first, candidatePair.second);
+                                candidate_set.emplace(-candidatePair.first, candidatePair.second);
+                                
 
                             while (top_candidates.size() > ef)
                                 top_candidates.pop();
